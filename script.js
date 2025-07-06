@@ -1,4 +1,4 @@
-
+<script>
 // Get parameters from URL (these would be encoded in the QR code)
 const urlParams = new URLSearchParams(window.location.search);
 const senderEmail = urlParams.get('sender') || 'sender@example.com';
@@ -96,3 +96,4 @@ console.log('Letter feedback page loaded', {
     recipientName: recipientName,
     timestamp: new Date().toISOString()
 });
+</script>
