@@ -200,3 +200,99 @@
             </p>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const senderEmail = urlParams.get('sender') || 'sender@example.com';
+            const letterID = urlParams.get('id') || 'LETTER-' + Date.now();
+            const recipientName = urlParams.get('name') || 'Recipient';
+            const letterSubject = urlParams.get('subject') || 'Letter Confirmation';
+
+            const loading = document.getElementById('loading');
+            const status = document.getElementById('status');
+            const sendBtn = document.getElementById('sendConfirmation');
+            const manualBtn = document.getElementById('manualEmail');
+
+            function showStatus(message, type) {
+                status.textContent = message;
+                status.className = `status ${type}`;
+                status.style.display = 'block';
+
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 5000);
+            }
+
+            function sendConfirmationEmailGmail() {
+                loading.classList.add('active');
+                sendBtn.disabled = true;
+
+                setTimeout(() => {
+                    loading.classList.remove('active');
+
+                    const currentDate = new Date().toLocaleString();
+                    const confirmationSubject = `Letter Received Confirmation - ${letterSubject}`;
+                    const confirmationBody = `Hello,
+
+This is an automated confirmation that your letter has been received and read.
+
+Details:
+- Letter ID: ${letterID}
+- Recipient: ${recipientName}
+- Confirmed at: ${currentDate}
+- User Agent: ${navigator.userAgent}
+
+The QR code in your letter was scanned successfully, confirming delivery.
+
+This is an automated message from the Letter Feedback System.`;
+
+                    // Gmail compose URL format
+                    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(senderEmail)}&su=${encodeURIComponent(confirmationSubject)}&body=${encodeURIComponent(confirmationBody)}`;
+                    
+                    // Open Gmail in a new tab
+                    window.open(gmailUrl, '_blank');
+
+                    showStatus('Gmail opened in a new tab with your confirmation email!', 'success');
+                    sendBtn.textContent = '✅ Gmail Opened';
+                    sendBtn.disabled = false;
+                }, 2000);
+            }
+
+            function sendManualEmailGmail() {
+                const subject = `Manual Letter Confirmation - ${letterSubject}`;
+                const body = `Hello,
+
+I'm writing to confirm that I received your letter (ID: ${letterID}).
+
+Thank you for including the QR code feedback system - it's a great way to confirm delivery!
+
+Best regards,
+${recipientName}`;
+
+                // Gmail compose URL format
+                const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(senderEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                
+                // Open Gmail in a new tab
+                window.open(gmailUrl, '_blank');
+
+                showStatus('Gmail opened in a new tab with your manual email!', 'success');
+            }
+
+            sendBtn.addEventListener('click', sendConfirmationEmailGmail);
+            manualBtn.addEventListener('click', sendManualEmailGmail);
+
+            if (recipientName && recipientName !== 'Recipient') {
+                document.querySelector('.header p').textContent = `Thank you ${recipientName} for scanning the QR code. This confirms you've received the letter.`;
+            }
+
+            console.log('Letter feedback page loaded (Gmail integration)', {
+                letterID: letterID,
+                senderEmail: senderEmail,
+                recipientName: recipientName,
+                timestamp: new Date().toISOString()
+            });
+        });
+    </script>
+</body>
+</html>
